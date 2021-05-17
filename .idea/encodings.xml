@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-common/common-gennerator" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-common/common-log" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-common/common-redis" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-common/common-security" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-common/common-swagger" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-gateway" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/leaf-service" charset="UTF-8" />
+  </component>
+</project>

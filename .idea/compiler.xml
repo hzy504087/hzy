@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="common-gennerator" />
+        <module name="common-log" />
+        <module name="common-redis" />
+        <module name="common-security" />
+        <module name="common-swagger" />
+        <module name="leaf-gateway" />
+        <module name="leaf-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="common-gennerator" target="1.8" />
+      <module name="common-log" target="1.8" />
+      <module name="common-redis" target="1.8" />
+      <module name="common-security" target="1.8" />
+      <module name="common-swagger" target="1.8" />
+      <module name="leaf" target="1.8" />
+      <module name="leaf-common" target="1.8" />
+      <module name="leaf-gateway" target="1.8" />
+      <module name="leaf-service" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
