@@ -2,6 +2,8 @@ package com.leaf.config;
 
 import com.leaf.entity.AccountDetailsService;
 import com.leaf.filter.JwtAuthenticationFilter;
+import com.leaf.handler.JwtAccessDeniedHandler;
+import com.leaf.handler.JwtAuthenticationEntryPoint;
 import com.leaf.handler.LoginFailureHandler;
 import com.leaf.handler.LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +24,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private LoginSuccessHandler loginSuccessHandler;
+
+    @Autowired
+    private LoginFailureHandler loginFailureHandler;
+
+    @Autowired
+    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     public static String ADMIN = "ROLE_ADMIN";
 
@@ -42,8 +57,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //登录配置
         http.cors().and().csrf().disable()
                 .formLogin()
-                .successHandler(new LoginSuccessHandler())
-                .failureHandler(new LoginFailureHandler())
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
                 .and()
                 .logout()
 //                .logoutSuccessHandler(jwtLogoutSuccessHandler)
@@ -53,30 +68,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 ////        //配置拦截规则
                 .and()
-//                .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(PERMIT_ALL_MAPPING)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
 //        //异常处理器
-//
-//        //自定义过滤器
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
         ;
     }
-
-    //    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .passwordEncoder(new BCryptPasswordEncoder())
-//                .withUser("admin")
-//                .password(new BCryptPasswordEncoder().encode("123456"))
-//                .roles("ADMIN")
-//                .and()
-//                .withUser("user")
-//                .password(new BCryptPasswordEncoder().encode("123456"))
-//                .roles("USER");
-//    }
+    @Autowired
+    private AccountDetailsService accountDetailsService;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -87,7 +93,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setHideUserNotFoundExceptions(false);
         provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(new AccountDetailsService());
+        provider.setUserDetailsService(accountDetailsService);
         return provider;
     }
 }

@@ -1,41 +1,58 @@
 package com.leaf.entity;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.leaf.config.WebSecurityConfig;
+//import com.leaf.service.SysUserService;
+import com.leaf.mapper.MyUserDetailsServiceMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Component
 public class AccountDetailsService implements UserDetailsService {
-    private List<UserDetails> userList = new ArrayList<>();
-    public AccountDetailsService() {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        UserDetails user = User.withUsername("user").password(passwordEncoder.encode("123456")).authorities(WebSecurityConfig.USER).build();
-        UserDetails admin = User.withUsername("admin").password(passwordEncoder.encode("123456")).authorities(WebSecurityConfig.ADMIN).build();
-        userList.add(user);
-        userList.add(admin);
-    }
+    @Autowired
+    private MyUserDetailsServiceMapper myUserDetailsServiceMapper;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println(username);
-        for (UserDetails userDetails : userList) {
-            if (userDetails.getUsername().equals(username)) {
-                // 此处我尝试过直接返回 user
-                // 但是这样的话，只有后台服务启动后第一次登陆会有效
-                // 推出后第二次登陆会出现  Empty encoded password 的错误，导致无法登陆
-                // 这样写就不会出现这种问题了
-                // 因为在第一次验证后，用户的密码会被清除，导致第二次登陆系统拿到的是空密码
-                // 所以需要new一个对象或将原对象复制一份
-                // 这个解决方案来自 https://stackoverflow.com/questions/43007763/spring-security-encoded-password-gives-me-bad-credentials/43046195#43046195
-                return new User(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
-            }
+        //1.加载基础用户信息
+        AccountDetails userName = myUserDetailsServiceMapper.findByUserName(username);
+
+        //加载用户角色列表
+        List<String> roleCodes = myUserDetailsServiceMapper.findRoleByUserName(username);
+
+        if (roleCodes!=null&&roleCodes.size() > 0) {
+            //3.通过用户角色列表加载用户的资源权限列表
+//            authorizeRequests
+            List<String> authorizes = myUserDetailsServiceMapper.findApiByRoleCodes(roleCodes);
+            //4.角色是一个特殊的权限，SpringSecurity规定对于角色需要加上ROLE_前缀
+            roleCodes = roleCodes.stream()
+                    .map(rc -> "ROLE_" + rc)
+                    .collect(Collectors.toList());
+
+            authorizes.addAll(roleCodes);
+
+            //5.将用户权限列表赋给用户信息
+            userName.setAuthorities(
+                    AuthorityUtils.commaSeparatedStringToAuthorityList(
+                            String.join(",", authorizes)
+                    )
+            );
         }
-        throw new UsernameNotFoundException("用户名不存在，请检查用户名或注册！");
+                return userName;
     }
+
 }

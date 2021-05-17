@@ -36,25 +36,23 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         authorities.forEach(authority -> {
             stringBuffer.append(authority.getAuthority()).append(",");
         });
-        Object details = authentication.getDetails();
+//        Object details = authentication.getDetails();
 //        if (details.getRememberMe() != null && details.getRememberMe()) {
 ////            expirationTime = COOKIE_EXPIRATION_TIME * 1000;
 ////            cookExpirationTime = COOKIE_EXPIRATION_TIME;
 //        }
         String name = authentication.getName();
-        jwtTokenUtil.generateToken(name,null);
+        String token = jwtTokenUtil.generateToken(name, null);
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
-        Result result1 = Result.success("");
+        response.setHeader("Authorization",token);
+        Result result1 = Result.success("登陆成功");
         out.write(new ObjectMapper().writeValueAsString(result1));
         out.flush();
         out.close();
 
-//        response.setContentType("application/json;charset=UTF-8");
+//      response.setContentType("application/json;charset=UTF-8");
 //		ServletOutputStream outputStream = response.getOutputStream();
-//		System.out.println(request);
-//		System.out.println(response);
-//		System.out.println(authentication);
 //		UserDetails userDetails=accountDetailsService.loadUserByUsername("user");
 //		// 生成jwt，并放置到请求头中
 //		String token = jwtTokenUtil.generateToken(userDetails,null);

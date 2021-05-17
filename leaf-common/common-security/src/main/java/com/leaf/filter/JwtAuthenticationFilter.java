@@ -27,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
 
         String token=httpServletRequest.getHeader(jwtUtils.getHeader());
+        System.out.println(httpServletRequest.getRequestURI());
         if(StrUtil.isBlankOrUndefined(token)){
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
@@ -41,4 +42,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+//     if (!request.getRequestURI().equals("/admin/login.json") && !request.getRequestURI().equals("/admin/logout.json")) {
+//        StringRedisTemplate stringRedisTemplate = stringRedisTemplateEx.getUserDateBase();
+//        String token = request.getHeader("token");
+//        if (!StringUtils.isEmpty(token)) {
+//            String key = RedisKey.userToken + token;
+//            Boolean isLogin = stringRedisTemplate.hasKey(key);
+//            if (isLogin != null && isLogin) {
+//                String s = stringRedisTemplate.opsForValue().get(key);
+//                AdminUser adminUser = JSONObject.parseObject(s, AdminUser.class);
+//                assert adminUser != null;
+//                // 用户的权限
+//                Collection<? extends GrantedAuthority> authorities = adminUser.getAuthorities();
+//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(adminUser, null, authorities);
+//                SecurityContextHolder.getContext()
+//                        .setAuthentication(authentication);
+//                request.setAttribute("userId", adminUser.getUserId());
+//            } else {
+////                    notToken(response);
+////                    return;
+//            }
+//        } else {
+////                notToken(response);
+////                return;
+//        }
+//    }
+//        filterChain.doFilter(request, response);
 }
