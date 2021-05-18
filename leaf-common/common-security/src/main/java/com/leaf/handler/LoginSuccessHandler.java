@@ -1,6 +1,7 @@
 package com.leaf.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leaf.entity.AccountDetails;
 import com.leaf.entity.AccountDetailsService;
 import com.leaf.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-
-
     @Autowired
     private AccountDetailsService accountDetailsService;
 
@@ -36,13 +35,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         authorities.forEach(authority -> {
             stringBuffer.append(authority.getAuthority()).append(",");
         });
-//        Object details = authentication.getDetails();
+//        AccountDetails details = (AccountDetails) authentication.getDetails();
 //        if (details.getRememberMe() != null && details.getRememberMe()) {
-////            expirationTime = COOKIE_EXPIRATION_TIME * 1000;
-////            cookExpirationTime = COOKIE_EXPIRATION_TIME;
+//            jwtTokenUtil.setExpireDate(77777L);
 //        }
-        String name = authentication.getName();
-        String token = jwtTokenUtil.generateToken(name, null);
+        String token = jwtTokenUtil.createToken(authentication.getName());
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
         response.setHeader("Authorization",token);

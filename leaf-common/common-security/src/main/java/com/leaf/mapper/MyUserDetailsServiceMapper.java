@@ -62,11 +62,11 @@ public interface MyUserDetailsServiceMapper {
      */
     @Select({
             "<script>",
-            "SELECT url ",
-            "FROM sys_api a ",
-            "LEFT JOIN sys_role_api ra ON a.id = ra.api_id ",
+            "SELECT perms ",
+            "FROM sys_menu a ",
+            "LEFT JOIN sys_role_menu ra ON a.id = ra.menu_id ",
             "LEFT JOIN sys_role r ON r.id = ra.role_id ",
-            "WHERE r.role_code IN ",
+            "WHERE r.code IN ",
             "<foreach collection='roleCodes' item='roleCode' open='(' separator=',' close=')'>",
             "#{roleCode}",
             "</foreach>",

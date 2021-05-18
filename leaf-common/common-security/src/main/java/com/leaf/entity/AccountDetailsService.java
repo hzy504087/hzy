@@ -25,18 +25,15 @@ public class AccountDetailsService implements UserDetailsService {
     @Autowired
     private MyUserDetailsServiceMapper myUserDetailsServiceMapper;
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //1.加载基础用户信息
-        AccountDetails userName = myUserDetailsServiceMapper.findByUserName(username);
-
+        AccountDetails accountDetails = myUserDetailsServiceMapper.findByUserName(username);
         //加载用户角色列表
         List<String> roleCodes = myUserDetailsServiceMapper.findRoleByUserName(username);
 
         if (roleCodes!=null&&roleCodes.size() > 0) {
             //3.通过用户角色列表加载用户的资源权限列表
-//            authorizeRequests
             List<String> authorizes = myUserDetailsServiceMapper.findApiByRoleCodes(roleCodes);
             //4.角色是一个特殊的权限，SpringSecurity规定对于角色需要加上ROLE_前缀
             roleCodes = roleCodes.stream()
@@ -44,15 +41,14 @@ public class AccountDetailsService implements UserDetailsService {
                     .collect(Collectors.toList());
 
             authorizes.addAll(roleCodes);
-
             //5.将用户权限列表赋给用户信息
-            userName.setAuthorities(
+            accountDetails.setAuthorities(
                     AuthorityUtils.commaSeparatedStringToAuthorityList(
                             String.join(",", authorizes)
                     )
             );
         }
-                return userName;
+        return accountDetails;
     }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,93 +29,43 @@ public class JwtTokenUtil {
     //JWT有效时间
     @Value("${night.jwt.expireDate}")
     private Long expireDate;
-
-    protected static final long MILLIS_SECOND = 1000;
-
-    protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
-
-    private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
 //    @Autowired
 //    private RedisCache redisCache;
     /**
      * 生成token令牌
-     *
      * @param userDetails 用户
-     * @param payloads    令牌中携带的附加信息
-     * @return 令token牌
+     * @return 令牌
      */
-    public String generateToken(UserDetails userDetails,
-                                Map<String, String> payloads) {
-        int payloadSizes = payloads == null ? 0 : payloads.size();
-
-        Map<String, Object> claims = new HashMap<>(payloadSizes + 2);
+    public String createToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
         claims.put("sub", userDetails.getUsername());
         claims.put("created", new Date());
-
-        if (payloadSizes > 0) {
-            for (Map.Entry<String, String> entry : payloads.entrySet()) {
-                claims.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return generateToken(claims);
+        return createToken(claims);
     }
     /**
      * 生成token令牌
      *
-     * @param token 用户
-     * @param payloads    令牌中携带的附加信息
-     * @return 令token牌
+     * @param username 用户
+     * @return 令牌
      */
-    public String generateToken(String token,
-                                Map<String, String> payloads) {
-        int payloadSizes = payloads == null ? 0 : payloads.size();
+    public String createToken(String username) {
 
-        Map<String, Object> claims = new HashMap<>(payloadSizes + 2);
-        claims.put("sub", token);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", username);
         claims.put("created", new Date());
-
-        if (payloadSizes > 0) {
-            for (Map.Entry<String, String> entry : payloads.entrySet()) {
-                claims.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return generateToken(claims);
+        return createToken(claims);
     }
+
     /**
      * 从令牌中获取用户名
-     *
      * @param token 令牌
      * @return 用户名
      */
-    public String getUsernameFromToken(String token) {
-        String username;
-        try {
-            Claims claims = getClaimsFromToken(token);
-            username = claims.getSubject();
-        } catch (Exception e) {
-            username = null;
-        }
-        return username;
+    public String getUsernameFromToken(String token)
+    {
+        Claims claims = parseToken(token);
+        return claims.getSubject();
     }
-
-    /**
-     * 判断令牌是否过期
-     *
-     * @param token 令牌
-     * @return 是否过期
-     */
-    public Boolean isTokenExpired(String token) {
-        try {
-            Claims claims = getClaimsFromToken(token);
-            Date expiration = claims.getExpiration();
-            return expiration.before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     /**
      * 刷新令牌
      *
@@ -122,66 +73,48 @@ public class JwtTokenUtil {
      * @return 新令牌
      */
     public String refreshToken(String token) {
-        String refreshedToken;
-        try {
-            Claims claims = getClaimsFromToken(token);
-            claims.put("created", new Date());
-            refreshedToken = generateToken(claims);
-        } catch (Exception e) {
-            refreshedToken = null;
-        }
+        Claims claims = parseToken(token);
+        claims.put("created", new Date());
+        String refreshedToken = createToken(claims);
         return refreshedToken;
     }
-
     /**
-     * 验证令牌
+     * 判断令牌是否过期
      *
-     * @param token       令牌
-     * @param userDetails 用户
-     * @return 是否有效
+     * @param token 令牌
+     * @return 是否过期
      */
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean isTokenExpired(String token) {
+            Claims claims = parseToken(token);
+            Date expiration = claims.getExpiration();
+            return expiration.before(new Date());
     }
-
-
     /**
-     * 从claims生成令牌,如果看不懂就看谁调用它
+     * 从数据声明生成令牌
      *
      * @param claims 数据声明
      * @return 令牌
      */
-    private String generateToken(Map<String, Object> claims) {
+    private String createToken(Map<String, Object> claims)
+    {
         Date expirationDate = new Date(System.currentTimeMillis() + 1000);
-        return Jwts.builder()
-                .setHeaderParam("typ", "JWT")
-                .setClaims(claims)
+        String token = Jwts.builder()
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
+        return token;
     }
-
     /**
-     * 从令牌中获取数据声明,如果看不懂就看谁调用它
+     * 从令牌中获取数据声明
      *
      * @param token 令牌
      * @return 数据声明
      */
-    private Claims getClaimsFromToken(String token) {
-        Claims claims;
-        try {
-            claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-        } catch (Exception e) {
-            claims = null;
-        }
-        return claims;
-    }
-
-    public static void main(String[] args) {
-        JwtTokenUtil jwtTokenUtil =new JwtTokenUtil();
-        Map<String,Object> map =new HashMap<>();
-        map.put("name","huag");
-        System.out.println(jwtTokenUtil.generateToken(map));
+    private Claims parseToken(String token)
+    {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

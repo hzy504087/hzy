@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -37,9 +38,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    public static String ADMIN = "ROLE_ADMIN";
-
-    public static String USER = "ROLE_USER";
+    @Autowired
+    private AccountDetailsService accountDetailsService;
 
     private final static String[] PERMIT_ALL_MAPPING = {
             "/api/hello",
@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //登录配置
+//      登录配置
         http.cors().and().csrf().disable()
                 .formLogin()
                 .successHandler(loginSuccessHandler)
@@ -62,31 +62,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
 //                .logoutSuccessHandler(jwtLogoutSuccessHandler)
-////        //禁用session
+//              禁用session
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-////        //配置拦截规则
+//              配置拦截规则
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(PERMIT_ALL_MAPPING)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
-//        //异常处理器
+//              异常处理器
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
-        ;
+                .accessDeniedHandler(jwtAccessDeniedHandler);
     }
-    @Autowired
-    private AccountDetailsService accountDetailsService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
 
@@ -96,5 +95,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(accountDetailsService);
         return provider;
     }
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(accountDetailsService);
+//    }
 }
 
