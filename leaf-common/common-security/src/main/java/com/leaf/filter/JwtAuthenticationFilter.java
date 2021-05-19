@@ -25,20 +25,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
 
-//        String token=httpServletRequest.getHeader(jwtUtils.getHeader());
-//        System.out.println(httpServletRequest.getRequestURI());
-//        if(StrUtil.isBlankOrUndefined(token)){
-//            filterChain.doFilter(httpServletRequest, httpServletResponse);
-//            return;
-//        }
-//        String username = jwtUtils.getUsernameFromToken(token);
-//        if (jwtUtils.isTokenExpired(username)) {
-//            throw new JwtException("token已过期");
-//        }
-//        UsernamePasswordAuthenticationToken authentication
-//                = new UsernamePasswordAuthenticationToken(username, null,new AccountDetails().getAuthorities());
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token=httpServletRequest.getHeader(jwtUtils.getHeader());
+        if(StrUtil.isBlankOrUndefined(token)){
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            return;
+        }
+        Boolean tokenExpired = jwtUtils.isTokenExpired(token);
+        if (tokenExpired) {
+            throw new JwtException("token已过期");
+        }
+        UsernamePasswordAuthenticationToken authentication
+                = new UsernamePasswordAuthenticationToken(token, null,new AccountDetails().getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 //     if (!request.getRequestURI().equals("/admin/login.json") && !request.getRequestURI().equals("/admin/logout.json")) {
