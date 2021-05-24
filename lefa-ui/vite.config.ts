@@ -1,30 +1,28 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
 
-import { resolve } from 'path'
+import { resolve } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
-    }
+      "@": resolve(__dirname, "src"),
+    },
   },
-  base: './',
+  base: "./",
   server: {
-    port: 4000, 
-    open: true, 
-    cors: true 
+    port: 4000,
+    open: true,
+    cors: true,
     // 代理
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://xxx.xxx.xxx.xxx:8000',
-    //     changeOrigin: true,
-    //     secure: false,
-    //     rewrite: (path) => path.replace('/api/', '/')
-    //   }
-    // }
-  }
-
-})
+    proxy: {
+      "/api": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+});

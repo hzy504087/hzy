@@ -1,19 +1,17 @@
 import Axios from 'axios'
 import { ElMessage } from 'element-plus'
 
-const baseURL = 'https://api.github.com'
+const baseURL = '/api/v1/'
 
 const axios = Axios.create({
   baseURL,
   timeout: 20000
 })
-
 // 前置拦截器（发起请求之前的拦截）
 axios.interceptors.request.use(
   (response) => {
-    /**
-     * config 做处理
-     */
+    // 带token
+    response.headers.Authorization = localStorage.getItem('WEB_TOKEN')
     return response
   },
   (error) => {
@@ -27,6 +25,7 @@ axios.interceptors.response.use(
     /**
         response 和 error 做处理
      */
+
     return response
   },
   (error) => {

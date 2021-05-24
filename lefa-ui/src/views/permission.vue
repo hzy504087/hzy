@@ -1,6 +1,6 @@
 <template>
   <div>
-    hellow word
+    权限页
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import { ref, defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'HelloWorld',
+  name: 'permission',
   setup: () => {},
   methods: {
     vuexText() {}

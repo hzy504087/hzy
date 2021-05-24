@@ -1555,6 +1555,11 @@ path-starts-with@^1.0.0:
   dependencies:
     normalize-path "^2.1.1"
 
+path-to-regexp@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.npm.taobao.org/path-to-regexp/download/path-to-regexp-6.2.0.tgz#f7b3803336104c346889adece614669230645f38"
+  integrity sha1-97OAMzYQTDRoia3s5hRmkjBkXzg=
+
 path-type@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npm.taobao.org/path-type/download/path-type-3.0.0.tgz?cache=0&sync_timestamp=1611752107592&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fpath-type%2Fdownload%2Fpath-type-3.0.0.tgz#cef31dc8e0a1a3bb0d105c0cd97cf3bf47f4e36f"
@@ -1877,6 +1882,11 @@ sprintf-js@~1.0.2:
   resolved "https://registry.npm.taobao.org/sprintf-js/download/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
+store2@^2.12.0:
+  version "2.12.0"
+  resolved "https://registry.npm.taobao.org/store2/download/store2-2.12.0.tgz#e1f1b7e1a59b6083b2596a8d067f6ee88fd4d3cf"
+  integrity sha1-4fG34aWbYIOyWWqNBn9u6I/U088=
+
 string-hash@^1.1.1:
   version "1.1.3"
   resolved "https://registry.npm.taobao.org/string-hash/download/string-hash-1.1.3.tgz#e8aafc0ac1855b4666929ed7dd1275df5d6c811b"
@@ -2120,6 +2130,11 @@ vue@^3.0.5:
     "@vue/compiler-dom" "3.0.11"
     "@vue/runtime-dom" "3.0.11"
     "@vue/shared" "3.0.11"
+
+vuex@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npm.taobao.org/vuex/download/vuex-4.0.0.tgz#ac877aa76a9c45368c979471e461b520d38e6cf5"
+  integrity sha1-rId6p2qcRTaMl5Rx5GG1INOObPU=
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"

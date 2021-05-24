@@ -12,4 +12,5 @@ module.exports = {
   },
   plugins: ["vue", "@typescript-eslint", "plugin:prettier/recommended"],
   rules: {},
+  
 };
